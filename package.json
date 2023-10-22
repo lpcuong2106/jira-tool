@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint \"**/*.js\" --ignore-pattern node_modules/ --fix"
   },
   "author": "cuongle",
   "type": "module",
@@ -18,5 +19,12 @@
     "gradient": "^0.2.0",
     "inquirer": "^9.2.11",
     "nanospinner": "^1.1.0"
+  },
+  "devDependencies": {
+    "eslint": "^8.52.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.28.1",
+    "eslint-plugin-n": "^16.2.0",
+    "eslint-plugin-promise": "^6.1.1"
   }
 }
