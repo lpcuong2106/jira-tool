@@ -11,6 +11,7 @@ configDotenv()
 let username = process.env.USERNAME_JIRA
 let password = process.env.PASSWORD_JIRA
 let JIRA_URL = process.env.JIRA_URL
+let ACTIVE_SPRINT_ID = process.env.ACTIVE_SPRINT_ID;
 let allStories = []
 
 async function inputAccount () {
@@ -25,6 +26,19 @@ async function inputAccount () {
     })
     JIRA_URL = jiraInput.jiraUrl
     writeEnvToFile([{ key: 'JIRA_URL', value: JIRA_URL }])
+  }
+
+  if (!ACTIVE_SPRINT_ID) {
+    const activeSprintInput = await inquirer.prompt({
+      name: 'activeSprintId',
+      type: 'input',
+      message: 'What is your Jira server?',
+      default: () => {
+        return ''
+      }
+    })
+    ACTIVE_SPRINT_ID = activeSprintInput.activeSprintId
+    writeEnvToFile([{ key: 'ACTIVE_SPRINT_ID', value: ACTIVE_SPRINT_ID }])
   }
 
   if (!username) {
@@ -56,13 +70,13 @@ async function inputAccount () {
 
 async function getJiraSprints () {
   const spinner = createSpinner('Checking stories of the active spring...').start()
-  const { data: res } = await axios.get(`${JIRA_URL}/rest/agile/1.0/sprint/14667/issue?maxResults=100`, {
-    auth: {
-      username,
-      password
-    }
-  })
 
+  const { data: res } = await axios.get(`${JIRA_URL}/rest/agile/1.0/sprint/${ACTIVE_SPRINT_ID}/issue?maxResults=100`, {
+    auth: {
+      username, password
+    }
+
+  })
   const stories = res.issues.filter(issue => issue.fields.issuetype.name === 'Story')
   allStories = stories.map(story => story.key)
 
@@ -108,8 +122,7 @@ function createSubTask (stories) {
         }
         await axios.post(`${JIRA_URL}/rest/api/2/issue`, body, {
           auth: {
-            username,
-            password
+            username, password
           }
         })
         subTaskCreated.push(SUB_TASKS[key])
